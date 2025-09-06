@@ -12,7 +12,7 @@
 // PROJECT        : 
 // FILENAME       : tb_top.sv
 // Author         : yaopeng.kang
-// LAST MODIFIED  : 2025-09-03 14:16
+// LAST MODIFIED  : 2025-09-03 19:26
 // ***********************************************************************
 // DESCRIPTION    :
 // ***********************************************************************
@@ -24,15 +24,7 @@ module tb_top();
   logic       hclk    ;
   logic       hrst_n  ;
 
-  logic[31:0] s_haddr ;
-  logic[3 :0] s_hprot ;
-  logic[31:0] s_hrdata;
-  logic[0 :0] s_hready;
-  logic[1 :0] s_hresp ;
-  logic[0 :0] s_hsel  ;
-  logic[1 :0] s_htrans;
-  logic[31:0] s_hwdata;
-  logic[0 :0] s_hwrite;
+  ahb_intf ahb_if(hclk, hrst_n);
 
 
   initial begin
@@ -47,12 +39,12 @@ module tb_top();
   end
 
   initial begin
-    s_hsel   = 1'b0;
-    s_hwrite = 1'b0;
-    s_haddr  = 32'h0;
-    s_hprot  = 1'b0;
-    s_hwdata = 32'h0;
-    s_htrans = 2'h0;
+    ahb_if.hsel   = 1'b0;
+    ahb_if.hwrite = 1'b0;
+    ahb_if.haddr  = 32'h0;
+    ahb_if.hprot  = 1'b0;
+    ahb_if.hwdata = 32'h0;
+    ahb_if.htrans = 2'h0;
   end
 
   initial begin
@@ -68,16 +60,16 @@ module tb_top();
                   input  logic[31:0] hwdata);
     $display($realtime, ", start write, addr=%h, wdata=%0h", haddr, hwdata);
     @(posedge hclk);
-    s_hsel   <= 1'b1;
-    s_hwrite <= 1'b1;
-    s_haddr  <= haddr;
-    s_hprot  <= 1'b0;
-    s_htrans <= 2'h2;
+    ahb_if.hsel   <= 1'b1;
+    ahb_if.hwrite <= 1'b1;
+    ahb_if.haddr  <= haddr;
+    ahb_if.hprot  <= 1'b0;
+    ahb_if.htrans <= 2'h2;
     @(posedge hclk);
-    s_hsel   <= 1'b0;
-    s_hwrite <= 1'b0;
-    s_hwdata <= hwdata;
-    while(s_hready==1'b0) begin
+    ahb_if.hsel   <= 1'b0;
+    ahb_if.hwrite <= 1'b0;
+    ahb_if.hwdata <= hwdata;
+    while(ahb_if.hready==1'b0) begin
       @(posedge hclk);
     end
     $display($realtime, ", write done, addr=%h", haddr);
@@ -87,18 +79,18 @@ module tb_top();
                  output logic[31:0] hrdata);
     $display($realtime, ", start read, addr=%h", haddr);
     @(posedge hclk);
-    s_hsel   <= 1'b1;
-    s_hwrite <= 1'b0;
-    s_haddr  <= haddr;
-    s_hprot  <= 1'b0;
-    s_htrans <= 2'h2;
+    ahb_if.hsel   <= 1'b1;
+    ahb_if.hwrite <= 1'b0;
+    ahb_if.haddr  <= haddr;
+    ahb_if.hprot  <= 1'b0;
+    ahb_if.htrans <= 2'h2;
     @(posedge hclk);
-    s_hsel <= 1'b0;
-    while(s_hready==1'b0) begin
+    ahb_if.hsel <= 1'b0;
+    while(ahb_if.hready==1'b0) begin
       @(posedge hclk);
     end
     @(posedge hclk);
-    hrdata = s_hrdata;
+    hrdata = ahb_if.hrdata;
     $display($realtime, ", read done, addr=%h, rdata=%0h", haddr, hrdata);
   endtask
 
@@ -155,15 +147,15 @@ module tb_top();
                   //,.m_htrans  ()
                   //,.m_hwdata  ()
                   //,.m_hwrite  ()
-                  ,.s_haddr   (s_haddr )
-                  ,.s_hprot   (s_hprot )
-                  ,.s_hrdata  (s_hrdata)
-                  ,.s_hready  (s_hready)
-                  ,.s_hresp   (s_hresp )
-                  ,.s_hsel    (s_hsel  )
-                  ,.s_htrans  (s_htrans)
-                  ,.s_hwdata  (s_hwdata)
-                  ,.s_hwrite  (s_hwrite)
+                  ,.s_haddr   (ahb_if.haddr )
+                  ,.s_hprot   (ahb_if.hprot )
+                  ,.s_hrdata  (ahb_if.hrdata)
+                  ,.s_hready  (ahb_if.hready)
+                  ,.s_hresp   (ahb_if.hresp )
+                  ,.s_hsel    (ahb_if.hsel  )
+                  ,.s_htrans  (ahb_if.htrans)
+                  ,.s_hwdata  (ahb_if.hwdata)
+                  ,.s_hwrite  (ahb_if.hwrite)
   );
 
 

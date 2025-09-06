@@ -16,4 +16,7 @@ git checkout tags/V1.0
 ```
 git checkout tags/V1.1
 ```
-
+  ### 1.2 使用interface封装信号
+```
+git checkout tags/V1.2
+```
