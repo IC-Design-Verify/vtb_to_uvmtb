@@ -20,3 +20,7 @@ git checkout tags/V1.1
 ```
 git checkout tags/V1.2
 ```
+  ### 1.3 将函数封装到interface中
+```
+git checkout tags/V1.3
+```

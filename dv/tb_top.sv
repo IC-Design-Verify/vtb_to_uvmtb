@@ -39,15 +39,6 @@ module tb_top();
   end
 
   initial begin
-    ahb_if.hsel   = 1'b0;
-    ahb_if.hwrite = 1'b0;
-    ahb_if.haddr  = 32'h0;
-    ahb_if.hprot  = 1'b0;
-    ahb_if.hwdata = 32'h0;
-    ahb_if.htrans = 2'h0;
-  end
-
-  initial begin
     #2000;
     $finish;
   end
@@ -55,44 +46,6 @@ module tb_top();
   initial begin
     $fsdbDumpvars(0, tb_top, "+mda");
   end
-
-  task ahb_write( input  logic[31:0] haddr, 
-                  input  logic[31:0] hwdata);
-    $display($realtime, ", start write, addr=%h, wdata=%0h", haddr, hwdata);
-    @(posedge hclk);
-    ahb_if.hsel   <= 1'b1;
-    ahb_if.hwrite <= 1'b1;
-    ahb_if.haddr  <= haddr;
-    ahb_if.hprot  <= 1'b0;
-    ahb_if.htrans <= 2'h2;
-    @(posedge hclk);
-    ahb_if.hsel   <= 1'b0;
-    ahb_if.hwrite <= 1'b0;
-    ahb_if.hwdata <= hwdata;
-    while(ahb_if.hready==1'b0) begin
-      @(posedge hclk);
-    end
-    $display($realtime, ", write done, addr=%h", haddr);
-  endtask
-
-  task ahb_read( input  logic[31:0] haddr, 
-                 output logic[31:0] hrdata);
-    $display($realtime, ", start read, addr=%h", haddr);
-    @(posedge hclk);
-    ahb_if.hsel   <= 1'b1;
-    ahb_if.hwrite <= 1'b0;
-    ahb_if.haddr  <= haddr;
-    ahb_if.hprot  <= 1'b0;
-    ahb_if.htrans <= 2'h2;
-    @(posedge hclk);
-    ahb_if.hsel <= 1'b0;
-    while(ahb_if.hready==1'b0) begin
-      @(posedge hclk);
-    end
-    @(posedge hclk);
-    hrdata = ahb_if.hrdata;
-    $display($realtime, ", read done, addr=%h, rdata=%0h", haddr, hrdata);
-  endtask
 
   function bit check_data(input bit[31:0] golden_data, 
                           input bit[31:0] actual_data);
@@ -106,11 +59,12 @@ module tb_top();
     bit[31:0] haddr;
     bit[31:0] wdata;
     bit[31:0] rdata;
+    ahb_if.reset();
     wait(hrst_n==1);
     haddr = 32'h00000000;
     wdata = 32'h5a5a5a5a;
-    ahb_write(haddr, wdata);
-    ahb_read (haddr, rdata);
+    ahb_if.ahb_write(haddr, wdata);
+    ahb_if.ahb_read (haddr, rdata);
     if(!check_data(wdata, rdata)) begin
       $error($sformatf("address 32'h<%0h> has wrong read data 32'h%0h, expect data is 32'h%0h", haddr, rdata, wdata));
     end
@@ -120,8 +74,8 @@ module tb_top();
 
     haddr = 32'h00000004;
     wdata = 32'hffff0000;
-    ahb_write(haddr, wdata);
-    ahb_read (haddr, rdata);
+    ahb_if.ahb_write(haddr, wdata);
+    ahb_if.ahb_read (haddr, rdata);
     if(!check_data(wdata, rdata)) begin
       $error($sformatf("address 32'h<%0h> has wrong read data 32'h%0h, expect data is 32'h%0h", haddr, rdata, wdata));
     end
