@@ -20,6 +20,8 @@
 // $Id: $
 // ***********************************************************************
 module tb_top();
+  import uvm_pkg::*;
+  import ahb_agent_pkg::*;
 
   logic       hclk    ;
   logic       hrst_n  ;
@@ -39,49 +41,12 @@ module tb_top();
   end
 
   initial begin
-    #2000;
-    $finish;
-  end
-
-  initial begin
     $fsdbDumpvars(0, tb_top, "+mda");
   end
 
-  function bit check_data(input bit[31:0] golden_data, 
-                          input bit[31:0] actual_data);
-    if (golden_data == actual_data)
-      return 1'b1;
-    else
-      return 1'b0;
-  endfunction
-
   initial begin
-    bit[31:0] haddr;
-    bit[31:0] wdata;
-    bit[31:0] rdata;
-    ahb_if.reset();
-    wait(hrst_n==1);
-    haddr = 32'h00000000;
-    wdata = 32'h5a5a5a5a;
-    ahb_if.ahb_write(haddr, wdata);
-    ahb_if.ahb_read (haddr, rdata);
-    if(!check_data(wdata, rdata)) begin
-      $error($sformatf("address 32'h<%0h> has wrong read data 32'h%0h, expect data is 32'h%0h", haddr, rdata, wdata));
-    end
-    else begin
-      $display($sformatf("address 32'h<%0h> write/read passed!", haddr));
-    end
-
-    haddr = 32'h00000004;
-    wdata = 32'hffff0000;
-    ahb_if.ahb_write(haddr, wdata);
-    ahb_if.ahb_read (haddr, rdata);
-    if(!check_data(wdata, rdata)) begin
-      $error($sformatf("address 32'h<%0h> has wrong read data 32'h%0h, expect data is 32'h%0h", haddr, rdata, wdata));
-    end
-    else begin
-      $display($sformatf("address 32'h<%0h> write/read passed!", haddr));
-    end
+    uvm_config_db#(virtual ahb_intf)::set(uvm_root::get(), "", "vif", ahb_if);
+    run_test("ahb_driver");
   end
 
   // DUT instance
