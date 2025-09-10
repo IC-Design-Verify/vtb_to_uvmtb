@@ -34,12 +34,12 @@ interface ahb_intf(input bit hclk,
 
   task reset();
     @(posedge hclk);
-    hsel   = 1'b0;
-    hwrite = 1'b0;
-    haddr  = 32'h0;
-    hprot  = 1'b0;
-    hwdata = 32'h0;
-    htrans = 2'h0;
+    hsel   <= 1'b0;
+    hwrite <= 1'b0;
+    haddr  <= 32'h0;
+    hprot  <= 1'b0;
+    hwdata <= 32'h0;
+    htrans <= 2'h0;
   endtask   
 
   task ahb_write( input  logic[31:0] _haddr, 
