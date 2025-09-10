@@ -43,6 +43,7 @@ class ahb_driver extends uvm_driver;
   // Standard UVM Methods:
   extern function new(string name, uvm_component parent);
   extern function void build_phase(uvm_phase phase);
+	extern virtual function void end_of_elaboration_phase(uvm_phase phase);
   extern virtual task reset_phase(uvm_phase phase);
   extern virtual task main_phase(uvm_phase phase);
 
@@ -60,6 +61,11 @@ function void ahb_driver::build_phase(uvm_phase phase);
     `uvm_fatal("VIF_NOT_FOUND", $sformatf("ahb vif is not set to driver"))
   end
 endfunction: build_phase
+
+function void ahb_driver::end_of_elaboration_phase(uvm_phase phase);
+  super.end_of_elaboration_phase(phase);
+	uvm_top.print_topology();
+endfunction
 
 task ahb_driver::reset_phase(uvm_phase phase);
   @(posedge vif.hclk);
