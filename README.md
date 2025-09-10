@@ -24,3 +24,7 @@ git checkout tags/V1.2
 ```
 git checkout tags/V1.3
 ```
+  ### 1.4 將ahb的讀寫操作從tb_top移植到ahb_driver中
+```
+git checkout tags/V1.4
+```
