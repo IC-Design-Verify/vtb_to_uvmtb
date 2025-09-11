@@ -32,3 +32,7 @@ git checkout tags/V1.4.1
 ```
 git checkout tags/V1.5
 ```
+  ### 1.6 添加sequence/sequencer，用于随机transaction在driver中发送
+```
+git checkout tags/V1.6
+```
