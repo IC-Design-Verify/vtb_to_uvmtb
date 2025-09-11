@@ -46,7 +46,7 @@ module tb_top();
 
   initial begin
     uvm_config_db#(virtual ahb_intf)::set(uvm_root::get(), "", "vif", ahb_if);
-    run_test("ahb_driver");
+    run_test("ahb_agent");
   end
 
   // DUT instance

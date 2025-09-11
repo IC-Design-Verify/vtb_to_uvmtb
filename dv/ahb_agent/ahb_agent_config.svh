@@ -10,22 +10,30 @@
 // *****************                                                       
 // ***********************************************************************
 // PROJECT        : 
-// FILENAME       : ahb_agent_pkg.sv
-// Author         : IC_VERIFY
-// LAST MODIFIED  : 2025-09-10 13:53
+// FILENAME       : ahb_agent_config.svh
+// Author         : yaopeng.kang
+// LAST MODIFIED  : 2025-09-11 10:26
 // ***********************************************************************
 // DESCRIPTION    :
 // ***********************************************************************
 // $Revision: $
 // $Id: $
 // ***********************************************************************
-package ahb_agent_pkg;
-  import uvm_pkg::*;
+class ahb_agent_config extends uvm_object;
 
-  `include "ahb_agent_config.svh"
-  `include "ahb_driver.svh"
-  `include "ahb_agent.svh"
-endpackage
+  `uvm_object_utils(ahb_agent_config)
+
+  virtual ahb_intf vif;
+  uvm_active_passive_enum active = UVM_PASSIVE;
+
+  // Standard UVM Methods:
+  extern function new(string name="ahb_agent_config");
+
+endclass: ahb_agent_config
+
+function ahb_agent_config::new(string name="ahb_agent_config");
+  super.new(name);
+endfunction: new
 // ***********************************************************************
 // $Log: $
 // $Revision $
