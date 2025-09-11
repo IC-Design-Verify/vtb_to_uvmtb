@@ -23,7 +23,10 @@ class ahb_agent extends uvm_agent;
 
   `uvm_component_utils(ahb_agent)
 
+  ahb_sequencer seqr;
   ahb_driver drv;
+  //ahb_monitor mon;
+  //uvm_analysis_port #(ahb_seq_item) analysis_port;
 
   ahb_agent_config agt_cfg;
 
@@ -56,13 +59,23 @@ function void ahb_agent::build_phase(uvm_phase phase);
   end
 
   if(agt_cfg.active == UVM_ACTIVE) begin
+    seqr = ahb_sequencer::type_id::create("seqr", this);
     drv = ahb_driver::type_id::create("drv", this);
   end
 
+  uvm_config_db#(uvm_object_wrapper)::set(this, "seqr.main_phase", "default_sequence", ahb_seq::type_id::get());
+
+  //mon = ahb_monitor::type_id::create("mon", this);
+  //mon.vif = agt_cfg.vif;
 endfunction: build_phase
 
 function void ahb_agent::connect_phase(uvm_phase phase);
   super.connect_phase(phase);
+
+  if(agt_cfg.active == UVM_ACTIVE) begin
+    drv.seq_item_port.connect(seqr.seq_item_export);
+  end
+  //this.analysis_port = mon.analysis_port;
 
 endfunction: connect_phase
 

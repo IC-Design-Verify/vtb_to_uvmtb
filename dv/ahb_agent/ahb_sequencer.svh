@@ -10,25 +10,37 @@
 // *****************                                                       
 // ***********************************************************************
 // PROJECT        : 
-// FILENAME       : ahb_agent_pkg.sv
-// Author         : IC_VERIFY
-// LAST MODIFIED  : 2025-09-10 13:53
+// FILENAME       : ahb_sequencer.svh
+// Author         : yaopeng.kang
+// LAST MODIFIED  : 2025-09-11 11:31
 // ***********************************************************************
 // DESCRIPTION    :
 // ***********************************************************************
 // $Revision: $
 // $Id: $
 // ***********************************************************************
-package ahb_agent_pkg;
-  import uvm_pkg::*;
+class ahb_sequencer extends uvm_sequencer #(ahb_seq_item,ahb_seq_item);
 
-  `include "ahb_seq_item.svh"
-  `include "ahb_sequence.svh"
-  `include "ahb_agent_config.svh"
-  `include "ahb_driver.svh"
-  `include "ahb_sequencer.svh"
-  `include "ahb_agent.svh"
-endpackage
+  // UVM Factory Registration Macro
+  //
+	`uvm_component_utils(ahb_sequencer)
+
+  //------------------------------------------
+  // Data Members
+  //------------------------------------------
+
+  //------------------------------------------
+  // Methods
+  //------------------------------------------
+
+  // Standard UVM Methods:
+	extern function new(string name = "ahb_sequencer", uvm_component parent = null);
+
+endclass: ahb_sequencer
+
+function ahb_sequencer::new(string name = "ahb_sequencer", uvm_component parent = null);
+	super.new(name, parent);
+endfunction: new
 // ***********************************************************************
 // $Log: $
 // $Revision $

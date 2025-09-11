@@ -19,7 +19,7 @@
 // $Revision: $
 // $Id: $
 // ***********************************************************************
-class ahb_driver extends uvm_driver;
+class ahb_driver extends uvm_driver #(ahb_seq_item);
 
   // UVM Factory Registration Macro
   //
@@ -68,6 +68,7 @@ function void ahb_driver::end_of_elaboration_phase(uvm_phase phase);
 endfunction
 
 task ahb_driver::reset_phase(uvm_phase phase);
+  phase.raise_objection(this);
   @(posedge vif.hclk);
   vif.hsel   <= 1'b0;
   vif.hwrite <= 1'b0;
@@ -75,6 +76,8 @@ task ahb_driver::reset_phase(uvm_phase phase);
   vif.hprot  <= 1'b0;
   vif.hwdata <= 32'h0;
   vif.htrans <= 2'h0;
+  while(vif.hrst_n!==1) @(posedge vif.hclk);
+  phase.drop_objection(this);
 endtask
 
 task ahb_driver::main_phase(uvm_phase phase);
@@ -82,20 +85,17 @@ task ahb_driver::main_phase(uvm_phase phase);
   bit[31:0] wdata;
   bit[31:0] rdata;
 
-  phase.raise_objection(this);
-  while(vif.hrst_n!==1) @(posedge vif.hclk);
+  forever begin
+    seq_item_port.get_next_item(req);
 
-  haddr = 32'h00000000;
-  wdata = 32'h5a5a5a5a;
-  vif.ahb_write(haddr, wdata);
-  vif.ahb_read (haddr, rdata);
+    vif.ahb_write(req.haddr, req.hwdata);
+    vif.ahb_read (req.haddr, req.hrdata);
 
-  haddr = 32'h00000004;
-  wdata = 32'hffff0000;
-  vif.ahb_write(haddr, wdata);
-  vif.ahb_read (haddr, rdata);
-
-  phase.drop_objection(this);
+    $cast(rsp, req.clone);
+    rsp.set_id_info(req);
+    
+    seq_item_port.item_done(rsp);
+  end
 endtask: main_phase
 
 // ***********************************************************************
